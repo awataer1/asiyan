@@ -1,231 +1,235 @@
-// --- 1. SAYAÇ (Site kapalıyken bile arka planda akar, sıfırlanmaz) ---
-// Tam olarak 1 yıl, 11 gün, 22 saat, 15 dakika öncesini baz alır
-const baseTimeKey = "așiyan_start_time";
-let startDate;
-
-if (localStorage.getItem(baseTimeKey)) {
-    startDate = new Date(localStorage.getItem(baseTimeKey));
-} else {
-    startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    startDate.setDate(startDate.getDate() - 11);
-    startDate.setHours(startDate.getHours() - 22);
-    startDate.setMinutes(startDate.getMinutes() - 15);
-    localStorage.setItem(baseTimeKey, startDate.toISOString());
-}
+// --- 1. KESİNTİSİZ SAYAÇ (Siteden çıksan bile arka planda akar) ---
+// İstediğin 1 yıl 12 gün kriterine göre sabit başlangıç tarihi (23 Eylül 2025)
+const startDate = new Date("2025-09-23T00:00:00");
 
 function updateCounter() {
     const now = new Date();
-    const diff = now - startDate;
+    let diff = now - startDate;
 
-    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    const days = Math.floor((diff / (1000 * 60 * 60 * 24)) % 365);
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const mins = Math.floor((diff / 1000 / 60) % 60);
-    const secs = Math.floor((diff / 1000) % 60);
+    if (diff < 0) diff = 0;
 
-    document.getElementById('years').innerText = years;
-    document.getElementById('days').innerText = days;
-    document.getElementById('hours').innerText = hours;
-    document.getElementById('mins').innerText = mins;
-    document.getElementById('secs').innerText = secs;
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const daysTotal = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    const years = Math.floor(daysTotal / 365);
+    const days = daysTotal % 365;
+
+    document.getElementById("years").innerText = years;
+    document.getElementById("days").innerText = days;
+    document.getElementById("hours").innerText = hours;
+    document.getElementById("mins").innerText = minutes;
+    document.getElementById("secs").innerText = seconds;
 }
 setInterval(updateCounter, 1000);
 updateCounter();
 
-// --- 2. SPOTIFY (Kalıcı hafızalı) ---
-function setupSpotify(inputId, containerId, storageKey) {
-    const input = document.getElementById(inputId);
-    const container = document.getElementById(containerId);
-
-    // Kayıtlı şarkı varsa yükle
-    const savedUrl = localStorage.getItem(storageKey);
-    if (savedUrl) {
-        input.value = savedUrl;
-        renderEmbed(savedUrl, container);
+// --- 2. SPOTIFY KUTULARI ---
+function updateSpotify(user) {
+    const url = document.getElementById(`${user}-spotify-url`).value;
+    const container = document.getElementById(`${user}-player-container`);
+    
+    let trackId = "";
+    if (url.includes("track/")) {
+        trackId = url.split("track/")[1].split("?")[0];
     }
+    
+    if (trackId) {
+        container.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${trackId}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+        localStorage.setItem(`${user}-spotify`, trackId);
+    }
+}
 
-    input.addEventListener('input', () => {
-        let url = input.value;
-        localStorage.setItem(storageKey, url);
-        renderEmbed(url, container);
+window.addEventListener('DOMContentLoaded', () => {
+    ['adda', 'nuriş'].forEach(user => {
+        const savedTrack = localStorage.getItem(`${user}-spotify`);
+        if (savedTrack) {
+            document.getElementById(`${user}-spotify-url`).value = `https://open.spotify.com/track/${savedTrack}`;
+            document.getElementById(`${user}-player-container`).innerHTML = `<iframe src="https://open.spotify.com/embed/track/${savedTrack}" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
+        }
+    });
+    loadTodos();
+    loadMemories();
+    loadCapsules();
+});
+
+// --- 3. CHECKLIST ---
+function addTodo(user) {
+    const input = document.getElementById(`${user}-todo-input`);
+    const text = input.value.trim();
+    if (!text) return;
+
+    let todos = JSON.parse(localStorage.getItem(`${user}-todos`) || "[]");
+    todos.push({ text, completed: false });
+    localStorage.setItem(`${user}-todos`, JSON.stringify(todos));
+    
+    input.value = "";
+    loadTodos();
+}
+
+function loadTodos() {
+    ['adda', 'nuriş'].forEach(user => {
+        const list = document.getElementById(`${user}-todo-list`);
+        const todos = JSON.parse(localStorage.getItem(`${user}-todos`) || "[]");
+        list.innerHTML = "";
+        todos.forEach((todo, index) => {
+            list.innerHTML += `<li>
+                <span style="${todo.completed ? 'text-decoration: line-through; color: #999;' : ''}">${todo.text}</span>
+                <button onclick="toggleTodo('${user}', ${index})" style="padding: 2px 6px; font-size:0.8rem;">✓</button>
+            </li>`;
+        });
     });
 }
 
-function renderEmbed(url, container) {
-    if (url.includes('spotify.com')) {
-        let trackId = url.split('track/')[1]?.split('?')[0];
-        if (trackId) {
-            container.innerHTML = `<iframe src="https://open.spotify.com/embed/track/${trackId}" width="100%" height="152" frameBorder="0" allow="encrypted-media"></iframe>`;
-        }
-    }
-}
-setupSpotify('adda-spotify-url', 'adda-player-container', 'adda_spotify');
-setupSpotify('nuriş-spotify-url', 'nuriş-player-container', 'nuriş_spotify');
-
-// --- 3. RUH HALİ (Kalıcı hafızalı) ---
-function initMood(user) {
-    const select = document.getElementById(`${user}-mood`);
-    const savedMood = localStorage.getItem(`${user}-mood-val`);
-    if (savedMood) select.value = savedMood;
-}
-initMood('adda');
-initMood('nuriş');
-
-window.updateMood = function(user) {
-    const val = document.getElementById(`${user}-mood`).value;
-    localStorage.setItem(`${user}-mood-val`, val);
+function toggleTodo(user, index) {
+    let todos = JSON.parse(localStorage.getItem(`${user}-todos`) || "[]");
+    todos[index].completed = !todos[index].completed;
+    localStorage.setItem(`${user}-todos`, JSON.stringify(todos));
+    loadTodos();
 }
 
-// --- 4. TAŞ KAĞIT MAKAS (Türkçe) ---
-window.playRPS = function(choice) {
+// --- 4. TAŞ KAĞIT MAKAS ---
+function playRPS(playerChoice) {
     const choices = ['taş', 'kağıt', 'makas'];
     const nurişChoice = choices[Math.floor(Math.random() * choices.length)];
-    let result = '';
+    let resultText = `Nuriş'in seçimi: ${nurişChoice.toUpperCase()}. `;
 
-    if (choice === nurişChoice) {
-        result = `🤝 Berabere! İkiniz de ${choice} seçtiniz.`;
+    if (playerChoice === nurişChoice) {
+        resultText += "🤝 Berabere!";
     } else if (
-        (choice === 'taş' && nurişChoice === 'makas') ||
-        (choice === 'kağıt' && nurişChoice === 'taş') ||
-        (choice === 'makas' && nurişChoice === 'kağıt')
+        (playerChoice === 'taş' && nurişChoice === 'makas') ||
+        (playerChoice === 'kağıt' && nurişChoice === 'taş') ||
+        (playerChoice === 'makas' && nurişChoice === 'kağıt')
     ) {
-        result = `🎉 Kazandın! Nuriş ${nurişChoice} seçmişti.`;
+        resultText += "🎉 Sen Kazandın!";
     } else {
-        result = `❤️ Nuriş kazandı! Nuriş ${nurişChoice} seçmişti.`;
+        resultText += "😢 Nuriş Kazandı!";
     }
-    document.getElementById('rps-result').innerText = result;
+    document.getElementById("rps-result").innerText = resultText;
 }
 
-// --- 5. GERÇEK DÖNEN ÇARK ÇİZİMİ VE MEKANİĞİ ---
-const activities = [
-    "🎬 Film İzle",
-    "☕ Kahve İç",
-    "🎮 Oyun Oyna",
-    "🎧 Şarkı Dinle",
-    "🗺️ Plan Yap",
-    "📸 Albüme Bak"
+// --- 5. RUH HALLERİ ---
+function updateMood(user) {
+    const mood = document.getElementById(`${user}-mood`).value;
+    localStorage.setItem(`${user}-mood`, mood);
+}
+
+// --- 6. ÇARK ---
+const sectors = [
+    { color: "#ff7f50", text: "Film İzle 🎬" },
+    { color: "#e86333", text: "Kahve İç ☕" },
+    { color: "#ffb380", text: "Yürüyüşe Çık 🌳" },
+    { color: "#ff9966", text: "Şarkı Söyle 🎤" },
+    { color: "#ff6633", text: "Soru Sor 💬" },
+    { color: "#ffad33", text: "Tatlı Ye 🍩" }
 ];
-const colors = ["#ff7f50", "#ffb380", "#e86333", "#ffd1b3", "#ff9966", "#ffe6cc"];
+
 const canvas = document.getElementById("canvas-wheel");
 const ctx = canvas.getContext("2d");
-let currentAngle = 0;
+const rad = 150;
+let angle = 0;
+let isSpinning = false;
 
 function drawWheel() {
-    const numSegments = activities.length;
-    const arc = (2 * Math.PI) / numSegments;
-    ctx.clearRect(0, 0, 300, 300);
-
-    for (let i = 0; i < numSegments; i++) {
-        const angle = i * arc;
+    const arc = Math.PI / (sectors.length / 2);
+    sectors.forEach((sector, i) => {
         ctx.beginPath();
-        ctx.fillStyle = colors[i];
-        ctx.moveTo(150, 150);
-        ctx.arc(150, 150, 140, angle, angle + arc);
-        ctx.lineTo(150, 150);
+        ctx.fillStyle = sector.color;
+        ctx.moveTo(rad, rad);
+        ctx.arc(rad, rad, rad, i * arc, (i + 1) * arc);
+        ctx.lineTo(rad, rad);
         ctx.fill();
         ctx.save();
-
-        // Metinleri yerleştir
-        ctx.translate(150, 150);
-        ctx.rotate(angle + arc / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#4a3530";
+        ctx.translate(rad, rad);
+        ctx.rotate(i * arc + arc / 2);
+        ctx.fillStyle = "#fff";
         ctx.font = "bold 14px Poppins";
-        ctx.fillText(activities[i], 125, 5);
+        ctx.fillText(sector.text, 50, 10);
         ctx.restore();
-    }
+    });
 }
 drawWheel();
 
-window.spinWheel = function() {
-    const numSegments = activities.length;
-    const randomDegree = Math.floor(Math.random() * 360) + 1440; // En az 4 tur atsın
-    currentAngle += randomDegree;
+function spinWheel() {
+    if (isSpinning) return;
+    isSpinning = true;
+    document.getElementById("wheel-result").innerText = "Çark dönüyor... 🎡";
     
-    canvas.style.transform = `rotate(${currentAngle}deg)`;
-
-    document.getElementById('wheel-result').innerText = "Çark dönüyor... 🌀";
+    const randomDegree = Math.floor(Math.random() * 3600) + 720;
+    angle += randomDegree;
+    canvas.style.transform = `rotate(${angle}deg)`;
 
     setTimeout(() => {
-        const actualDegree = currentAngle % 360;
-        const segmentAngle = 360 / numSegments;
-        // Ok üstte olduğu için hesaplama
-        const index = Math.floor((360 - (actualDegree % 360)) / segmentAngle) % numSegments;
-        document.getElementById('wheel-result').innerText = `Seçilen Aktivite: ${activities[index]} ✨`;
+        isSpinning = false;
+        const actualDegree = angle % 360;
+        const index = Math.floor((360 - (actualDegree % 360)) / (360 / sectors.length)) % sectors.length;
+        document.getElementById("wheel-result").innerText = `🎯 Çıkan Sonuç: ${sectors[index].text}`;
     }, 4000);
 }
 
-// --- 6. CHECKLIST & ANILAR (Standart Fonksiyonlar) ---
-window.addTodo = function(user) {
-    const input = document.getElementById(`${user}-todo-input`);
-    const list = document.getElementById(`${user}-todo-list`);
-    if(!input.value.trim()) return;
+// --- 7. ZAMAN KAPSÜLÜ ---
+function saveCapsule() {
+    const date = document.getElementById("capsule-date").value;
+    const text = document.getElementById("capsule-text").value;
+    if (!date || !text) return;
 
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span> <button onclick="this.parentElement.remove()" style="padding: 2px 6px; font-size:0.7rem;">Sil</button>`;
-    list.appendChild(li);
-    input.value = '';
+    let capsules = JSON.parse(localStorage.getItem("capsules") || "[]");
+    capsules.push({ date, text });
+    localStorage.setItem("capsules", JSON.stringify(capsules));
+    
+    document.getElementById("capsule-date").value = "";
+    document.getElementById("capsule-text").value = "";
+    loadCapsules();
 }
 
-window.saveCapsule = function() {
-    const date = document.getElementById('capsule-date').value;
-    const text = document.getElementById('capsule-text').value;
-    const list = document.getElementById('capsules-list');
-    if(!date || !text) return;
-
-    const div = document.createElement('div');
-    div.style.marginTop = '10px';
-    div.style.padding = '10px';
-    div.style.background = '#fff4f0';
-    div.style.borderRadius = '8px';
-
+function loadCapsules() {
+    const container = document.getElementById("capsules-list");
+    const capsules = JSON.parse(localStorage.getItem("capsules") || "[]");
     const today = new Date().toISOString().split('T')[0];
-    if (today >= date) {
-        div.innerHTML = `<strong>Açıldı (${date}):</strong> ${text}`;
-    } else {
-        div.innerHTML = `🔒 <strong>Kilitli Not (${date} tarihinde açılacak)</strong>`;
-    }
-    list.appendChild(div);
-    document.getElementById('capsule-text').value = '';
+
+    container.innerHTML = "";
+    capsules.forEach((c, index) => {
+        const isUnlocked = today >= c.date;
+        container.innerHTML += `<div style="background: var(--light-orange); padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed var(--primary-orange);">
+            <small>Açılacağı Tarih: ${c.date}</small>
+            <p><strong>${isUnlocked ? c.text : '🔒 Bu not kilitli, tarihi gelince açılacak!'}</strong></p>
+        </div>`;
+    });
 }
 
-window.addMemory = function() {
-    const title = document.getElementById('memory-title').value;
-    const desc = document.getElementById('memory-desc').value;
-    const fileInput = document.getElementById('memory-img');
-    const container = document.getElementById('memories-container');
+// --- 8. ANILAR (PRATİK NOTLAR) ---
+function addMemory() {
+    const title = document.getElementById("memory-title").value;
+    const desc = document.getElementById("memory-desc").value;
+    if (!title || !desc) return;
 
-    if(!title || !fileInput.files[0]) return;
+    let memories = JSON.parse(localStorage.getItem("memories") || "[]");
+    memories.push({ title, desc });
+    localStorage.setItem("memories", JSON.stringify(memories));
 
-    const reader = new FileReader();
-    reader.readAsDataURL(fileInput.files[0]);
-    reader.onload = function(e) {
-        const img = new Image();
-        img.src = e.target.result;
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 600;
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
+    document.getElementById("memory-title").value = "";
+    document.getElementById("memory-desc").value = "";
+    loadMemories();
+}
 
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+function loadMemories() {
+    const container = document.getElementById("memories-container");
+    const memories = JSON.parse(localStorage.getItem("memories") || "[]");
+    container.innerHTML = "";
 
-            const card = document.createElement('div');
-            card.className = 'memory-card';
-            card.innerHTML = `
-                <h3>${title}</h3>
-                <p style="margin-top:5px; font-size:0.9rem;">${desc}</p>
-                <img src="${compressedDataUrl}">
-            `;
-            container.prepend(card);
+    memories.forEach((m, index) => {
+        container.innerHTML += `<div class="memory-card">
+            <button class="delete-btn" onclick="deleteMemory(${index})">X</button>
+            <h4>${m.title}</h4>
+            <p>${m.desc}</p>
+        </div>`;
+    });
+}
 
-            document.getElementById('memory-title').value = '';
-            document.getElementById('memory-desc').value = '';
-            document.getElementById('memory-img').value = '';
-        }
-    }
+function deleteMemory(index) {
+    let memories = JSON.parse(localStorage.getItem("memories") || "[]");
+    memories.splice(index, 1);
+    localStorage.setItem("memories", JSON.stringify(memories));
+    loadMemories();
 }
