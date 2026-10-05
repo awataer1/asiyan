@@ -3,120 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aşiyan - Bizim Yuvamız</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Aşiyan - Bizim Hikayemiz</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121a16;
-            --card-bg: #1a2620;
-            --accent-green: #3b5d4a;
-            --light-green: #5a8a70;
-            --text-main: #e2e8e4;
-            --text-muted: #94a39b;
-            --border-color: #273830;
+            --primary-orange: #ff7f50;
+            --dark-orange: #e86333;
+            --light-orange: #fff4f0;
+            --accent-orange: #ffb380;
+            --text-dark: #4a3530;
+            --white: #ffffff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-orange);
+            color: var(--text-dark);
             overflow-x: hidden;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             position: relative;
         }
 
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: var(--text-main);
+        /* Disney Karakterleri Dekoratif Arka Plan Öğeleri */
+        .disney-sticker {
+            position: absolute;
+            width: 80px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+            color: var(--white);
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 25px rgba(255, 127, 80, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 { font-family: 'Sacramento', cursive; font-size: 4rem; margin-bottom: 5px; }
+        header p { font-size: 1.1rem; font-weight: 300; }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(232, 99, 51, 0.08);
+            border: 2px solid rgba(255, 179, 128, 0.3);
+        }
+
+        h2 { color: var(--dark-orange); margin-bottom: 15px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; }
+
+        /* 1. Sayaç Bölümü */
+        #counter-box {
+            text-align: center;
+            background: linear-gradient(135deg, #fff0eb, #ffe4dc);
+        }
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .time-box {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .time-box span { display: block; font-size: 1.8rem; font-weight: 700; color: var(--dark-orange); }
+        .time-box label { font-size: 0.8rem; color: #775a50; }
+
+        /* 2. Spotify Müzik Kutuları */
+        .spotify-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media(max-width: 768px) { .spotify-grid { grid-template-columns: 1fr; } }
+        .spotify-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--accent-orange);
+            border-radius: 8px;
             margin-bottom: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            outline: none;
         }
+        iframe { width: 100%; height: 152px; border-radius: 12px; border: none; }
 
-        .subtitle {
-            color: var(--light-green);
-            font-size: 1rem;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .content-box {
-            margin-bottom: 30px;
-            line-height: 1.6;
-            color: var(--text-muted);
-            font-size: 1.05rem;
-        }
-
-        .btn {
-            background-color: var(--accent-green);
-            color: white;
+        /* 3. Checklist */
+        .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 768px) { .checklist-grid { grid-template-columns: 1fr; } }
+        .todo-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .todo-input-group input { flex: 1; padding: 8px 12px; border: 1px solid var(--accent-orange); border-radius: 8px; }
+        button {
+            background: var(--primary-orange);
+            color: var(--white);
             border: none;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 1rem;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            text-decoration: none;
-            display: inline-block;
+            font-weight: 500;
+            transition: 0.2s;
         }
+        button:hover { background: var(--dark-orange); }
+        ul { list-style: none; }
+        ul li { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
 
-        .btn:hover {
-            background-color: var(--light-green);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 93, 74, 0.4);
-        }
+        /* 4. Taş Kağıt Makas */
+        .rps-arena { text-align: center; }
+        .rps-btns { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .rps-btn { font-size: 1.5rem; padding: 10px 20px; background: var(--light-orange); border: 2px solid var(--primary-orange); border-radius: 12px; cursor: pointer; }
+        .rps-btn:hover { background: var(--accent-orange); }
 
-        footer {
-            margin-top: 30px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            opacity: 0.7;
+        /* 5. Ruh Hali Barı */
+        .mood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center; }
+        .mood-select { font-size: 1.2rem; padding: 8px; border-radius: 10px; border: 2px solid var(--primary-orange); width: 100%; margin-top: 5px; }
+
+        /* 6. Gerçek Dönen Çark Alanı */
+        .wheel-container { text-align: center; position: relative; }
+        .wheel-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
         }
+        #canvas-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid var(--dark-orange);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 4s cubic-bezier(0.15, 0.95, 0.15, 1);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 25px solid var(--dark-orange);
+            z-index: 10;
+        }
+        #wheel-result { font-size: 1.2rem; font-weight: 600; color: var(--dark-orange); margin-top: 15px; min-height: 30px; }
+
+        /* 7. Zaman Kapsülü */
+        .capsule-form { display: grid; gap: 10px; margin-bottom: 15px; }
+        .capsule-form input, .capsule-form textarea { width: 100%; padding: 10px; border: 1px solid var(--accent-orange); border-radius: 8px; }
+
+        /* 8. Anı Defteri */
+        .memory-form { display: grid; gap: 10px; margin-bottom: 20px; }
+        .memory-form input, .memory-form textarea { width: 100%; padding: 10px; border: 1px solid var(--accent-orange); border-radius: 8px; }
+        .memories-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .memory-card { background: var(--light-orange); border-radius: 12px; padding: 15px; border: 1px solid var(--accent-orange); }
+        .memory-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <!-- Arka Plan Süslemeleri -->
+    <img src="https://api.iconify.design/fluent-emoji-flat:castle.svg" class="disney-sticker" style="top: 5%; left: 3%;">
+    <img src="https://api.iconify.design/fluent-emoji-flat:sparkles.svg" class="disney-sticker" style="top: 25%; right: 5%;">
+    <img src="https://api.iconify.design/fluent-emoji-flat:shooting-star.svg" class="disney-sticker" style="top: 55%; left: 2%;">
+    <img src="https://api.iconify.design/fluent-emoji-flat:teddy-bear.svg" class="disney-sticker" style="top: 80%; right: 4%;">
+
+    <header>
         <h1>Aşiyan</h1>
-        <div class="subtitle">Kalbimizdeki Yuva</div>
-        
-        <div class="content-box">
-            <p>Burası bizim huzur limanımız, geleceğimizin ilk tuğlası...</p>
+        <p>Birlikte yazdığımız en güzel masal...</p>
+    </header>
+
+    <div class="container">
+
+        <!-- 1. SAYAÇ -->
+        <div class="card" id="counter-box">
+            <h2>⏳ Birlikte Geçen Zamanımız</h2>
+            <div class="time-grid">
+                <div class="time-box"><span id="years">0</span><label>Yıl</label></div>
+                <div class="time-box"><span id="days">0</span><label>Gün</label></div>
+                <div class="time-box"><span id="hours">0</span><label>Saat</label></div>
+                <div class="time-box"><span id="mins">0</span><label>Dakika</label></div>
+                <div class="time-box"><span id="secs">0</span><label>Saniye</label></div>
+            </div>
         </div>
 
-        <button class="btn" onclick="mesajGoster()">Bize Bir Not</button>
-        
-        <div id="dynamic-message" style="margin-top: 20px; color: var(--light-green); font-style: italic;"></div>
-    </div>
+        <!-- 2. SPOTIFY MÜZİK KUTULARI -->
+        <div class="card">
+            <h2>🎵 Spotify Şarkı Köşesi</h2>
+            <div class="spotify-grid">
+                <div>
+                    <h3>Adda'nın Şarkısı</h3>
+                    <input type="text" id="adda-spotify-url" placeholder="Spotify şarkı linkini yapıştır...">
+                    <div id="adda-player-container"></div>
+                </div>
+                <div>
+                    <h3>Nuriş'in Şarkısı</h3>
+                    <input type="text" id="nuriş-spotify-url" placeholder="Spotify şarkı linkini yapıştır...">
+                    <div id="nuriş-player-container"></div>
+                </div>
+            </div>
+        </div>
 
-    <footer>
-        Geleceğe sevgiyle...
-    </footer>
+        <!-- 3. CHECKLIST -->
+        <div class="card">
+            <h2>✨ Ortak Check-List</h2>
+            <div class="checklist-grid">
+                <div>
+                    <h3>Adda</h3>
+                    <div class="todo-input-group">
+                        <input type="text" id="adda-todo-input" placeholder="Yeni görev...">
+                        <button onclick="addTodo('adda')">Ekle</button>
+                    </div>
+                    <ul id="adda-todo-list"></ul>
+                </div>
+                <div>
+                    <h3>Nuriş</h3>
+                    <div class="todo-input-group">
+                        <input type="text" id="nuriş-todo-input" placeholder="Yeni görev...">
+                        <button onclick="addTodo('nuriş')">Ekle</button>
+                    </div>
+                    <ul id="nuriş-todo-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. TAŞ KAĞIT MAKAS -->
+        <div class="card rps-arena">
+            <h2>🎮 Taş - Kağıt - Makas Düellosu</h2>
+            <p>Seçimini yap ve Nuriş'e karşı şansını dene!</p>
+            <div class="rps-btns">
+                <button class="rps-btn" onclick="playRPS('taş')">🪨 Taş</button>
+                <button class="rps-btn" onclick="playRPS('kağıt')">📄 Kağıt</button>
+                <button class="rps-btn" onclick="playRPS('makas')">✂️ Makas</button>
+            </div>
+            <p id="rps-result" style="font-weight: 600; margin-top: 10px; font-size: 1.1rem;"></p>
+        </div>
+
+        <!-- 5. RUH HALİ BARI -->
+        <div class="card">
+            <h2>🌈 Anlık Ruh Hallerimiz</h2>
+            <div class="mood-grid">
+                <div>
+                    <label><strong>Adda</strong></label>
+                    <select class="mood-select" id="adda-mood" onchange="updateMood('adda')">
+                        <option value="🥰">🥰 Çok Mutlu</option>
+                        <option value="😴">😴 Uykulu</option>
+                        <option value="💻">💻 Çalışkan</option>
+                        <option value="☕">☕ Kahve Molasında</option>
+                        <option value="🥺">🥺 Özledi</option>
+                    </select>
+                </div>
+                <div>
+                    <label><strong>Nuriş</strong></label>
+                    <select class="mood-select" id="nuriş-mood" onchange="updateMood('nuriş')">
+                        <option value="🥰">🥰 Çok Mutlu</option>
+                        <option value="😴">😴 Uykulu</option>
+                        <option value="💻">💻 Çalışkan</option>
+                        <option value="☕">☕ Kahve Molasında</option>
+                        <option value="🥺">🥺 Özledi</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. GERÇEK DÖNEN ÇARK -->
+        <div class="card wheel-container">
+            <h2>🎡 Ne Yapalım Çarkı</h2>
+            <p>Kararsız kaldığında çarkı çevir!</p>
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <canvas id="canvas-wheel" width="300" height="300"></canvas>
+            </div>
+            <button onclick="spinWheel()" style="margin-top: 15px; font-size: 1rem; padding: 10px 25px;">Çarkı Çevir! 🎯</button>
+            <div id="wheel-result"></div>
+        </div>
+
+        <!-- 7. ZAMAN KAPSÜLÜ -->
+        <div class="card">
+            <h2>💌 Zaman Kapsülü (Geleceğe Not)</h2>
+            <div class="capsule-form">
+                <input type="date" id="capsule-date">
+                <textarea id="capsule-text" placeholder="Seçilen tarihte açılacak özel notunuzu yazın..."></textarea>
+                <button onclick="saveCapsule()">Kapsülü Kilitle 🔒</button>
+            </div>
+            <div id="capsules-list"></div>
+        </div>
+
+        <!-- 8. ANI DEFTERİ -->
+        <div class="card">
+            <h2>📸 Anı Defterimiz</h2>
+            <div class="memory-form">
+                <input type="text" id="memory-title" placeholder="Anı Başlığı...">
+                <textarea id="memory-desc" placeholder="Neler hissettiniz? Anıyı anlatın..."></textarea>
+                <input type="file" id="memory-img" accept="image/*">
+                <button onclick="addMemory()">Anıyı Ekle 🌟</button>
+            </div>
+            <div class="memories-list" id="memories-container"></div>
+        </div>
+
+    </div>
 
     <script src="script.js"></script>
 </body>
