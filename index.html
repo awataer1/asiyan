@@ -127,169 +127,43 @@
         /* 4. Taş Kağıt Makas */
         .rps-arena { text-align: center; }
         .rps-btns { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .rps-btn { font-size: 1.8rem; padding: 10px 20px; background: var(--light-orange); border: 2px solid var(--primary-orange); border-radius: 12px; cursor: pointer; }
+        .rps-btn { font-size: 1.5rem; padding: 10px 20px; background: var(--light-orange); border: 2px solid var(--primary-orange); border-radius: 12px; cursor: pointer; }
         .rps-btn:hover { background: var(--accent-orange); }
 
         /* 5. Ruh Hali Barı */
         .mood-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center; }
-        .mood-select { font-size: 1.5rem; padding: 8px; border-radius: 10px; border: 2px solid var(--primary-orange); width: 100%; margin-top: 5px; }
+        .mood-select { font-size: 1.2rem; padding: 8px; border-radius: 10px; border: 2px solid var(--primary-orange); width: 100%; margin-top: 5px; }
 
-        /* 6. Çark (Aktivite Seçici) */
-        .wheel-container { text-align: center; }
-        #wheel-result { font-size: 1.2rem; font-weight: 600; color: var(--dark-orange); margin-top: 15px; }
+        /* 6. Gerçek Dönen Çark Alanı */
+        .wheel-container { text-align: center; position: relative; }
+        .wheel-wrapper {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+        }
+        #canvas-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid var(--dark-orange);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 4s cubic-bezier(0.15, 0.95, 0.15, 1);
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 25px solid var(--dark-orange);
+            z-index: 10;
+        }
+        #wheel-result { font-size: 1.2rem; font-weight: 600; color: var(--dark-orange); margin-top: 15px; min-height: 30px; }
 
-        /* 7. Zaman Kapsülü Mektuplar */
+        /* 7. Zaman Kapsülü */
         .capsule-form { display: grid; gap: 10px; margin-bottom: 15px; }
-        .capsule-form input, .capsule-form textarea { width: 100%; padding: 10px; border: 1px solid var(--accent-orange); border-radius: 8px; }
-
-        /* 8. Anı Defteri */
-        .memory-form { display: grid; gap: 10px; margin-bottom: 20px; }
-        .memory-form input, .memory-form textarea { width: 100%; padding: 10px; border: 1px solid var(--accent-orange); border-radius: 8px; }
-        .memories-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
-        .memory-card { background: var(--light-orange); border-radius: 12px; padding: 15px; border: 1px solid var(--accent-orange); }
-        .memory-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-    <!-- Arka Plan Süslemeleri (Disney Temalı) -->
-    <img src="https://api.iconify.design/fluent-emoji-flat:castle.svg" class="disney-sticker" style="top: 5%; left: 3%;">
-    <img src="https://api.iconify.design/fluent-emoji-flat:sparkles.svg" class="disney-sticker" style="top: 25%; right: 5%;">
-    <img src="https://api.iconify.design/fluent-emoji-flat:shooting-star.svg" class="disney-sticker" style="top: 55%; left: 2%;">
-    <img src="https://api.iconify.design/fluent-emoji-flat:teddy-bear.svg" class="disney-sticker" style="top: 80%; right: 4%;">
-
-    <header>
-        <h1>Aşiyan</h1>
-        <p>Birlikte yazdığımız en güzel masal...</p>
-    </header>
-
-    <div class="container">
-
-        <!-- 1. SAYAÇ -->
-        <div class="card" id="counter-box">
-            <h2>⏳ Birlikte Geçen Zamanımız</h2>
-            <p>1 Yıl 11 Gün 22 Saatten Beri...</p>
-            <div class="time-grid">
-                <div class="time-box"><span id="days">0</span><label>Gün</label></div>
-                <div class="time-box"><span id="hours">0</span><label>Saat</label></div>
-                <div class="time-box"><span id="mins">0</span><label>Dakika</label></div>
-                <div class="time-box"><span id="secs">0</span><label>Saniye</label></div>
-            </div>
-        </div>
-
-        <!-- 2. SPOTIFY MÜZİK KUTULARI -->
-        <div class="card">
-            <h2>🎵 Spotify Şarkı Köşesi</h2>
-            <div class="spotify-grid">
-                <div>
-                    <h3>Adda'nın Şarkısı</h3>
-                    <input type="text" id="adda-spotify-url" placeholder="Spotify şarkı linkini yapıştır...">
-                    <div id="adda-player-container"></div>
-                </div>
-                <div>
-                    <h3>Nuriş'in Şarkısı</h3>
-                    <input type="text" id="nuriş-spotify-url" placeholder="Spotify şarkı linkini yapıştır...">
-                    <div id="nuriş-player-container"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. CHECKLIST -->
-        <div class="card">
-            <h2>✨ Ortak Check-List</h2>
-            <div class="checklist-grid">
-                <div>
-                    <h3>Adda</h3>
-                    <div class="todo-input-group">
-                        <input type="text" id="adda-todo-input" placeholder="Yeni görev...">
-                        <button onclick="addTodo('adda')">Ekle</button>
-                    </div>
-                    <ul id="adda-todo-list"></ul>
-                </div>
-                <div>
-                    <h3>Nuriş</h3>
-                    <div class="todo-input-group">
-                        <input type="text" id="nuriş-todo-input" placeholder="Yeni görev...">
-                        <button onclick="addTodo('nuriş')">Ekle</button>
-                    </div>
-                    <ul id="nuriş-todo-list"></ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. TAŞ KAĞIT MAKAS -->
-        <div class="card rps-arena">
-            <h2>🎮 Taş - Kağıt - Makas Düellosu</h2>
-            <p>Aynı anda seçim yapın ve sonucu görün!</p>
-            <div class="rps-btns">
-                <button class="rps-btn" onclick="playRPS('taş')"> piedra 🪨</button>
-                <button class="rps-btn" onclick="playRPS('kağıt')"> papel 📄</button>
-                <button class="rps-btn" onclick="playRPS('makas')"> tijera ✂️</button>
-            </div>
-            <p id="rps-result" style="font-weight: 600; margin-top: 10px; font-size: 1.1rem;"></p>
-        </div>
-
-        <!-- 5. RUH HALİ BARI -->
-        <div class="card">
-            <h2>🌈 Anlık Ruh Hallerimiz</h2>
-            <div class="mood-grid">
-                <div>
-                    <label><strong>Adda</strong></label>
-                    <select class="mood-select" id="adda-mood" onchange="updateMood('adda')">
-                        <option value="🥰">🥰 Çok Mutlu</option>
-                        <option value="😴">😴 Uykulu</option>
-                        <option value="💻">💻 Çalışkan</option>
-                        <option value="☕">☕ Kahve Molasında</option>
-                        <option value="🥺">🥺 Özledi</option>
-                    </select>
-                </div>
-                <div>
-                    <label><strong>Nuriş</strong></label>
-                    <select class="mood-select" id="nuriş-mood" onchange="updateMood('nuriş')">
-                        <option value="🥰">🥰 Çok Mutlu</option>
-                        <option value="😴">😴 Uykulu</option>
-                        <option value="💻">💻 Çalışkan</option>
-                        <option value="☕">☕ Kahve Molasında</option>
-                        <option value="🥺">🥺 Özledi</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. AKTİVİTE ÇARKI -->
-        <div class="card wheel-container">
-            <h2>🎡 Ne Yapalım Çarkı</h2>
-            <p>Kararsız kalındığında tıklayın, birlikte ne yapacağınızı seçelim!</p>
-            <button onclick="spinWheel()" style="margin-top: 15px; font-size: 1rem; padding: 10px 25px;">Çarkı Çevir! 🎯</button>
-            <div id="wheel-result">Çevirmeyi bekliyor...</div>
-        </div>
-
-        <!-- 7. ZAMAN KAPSÜLÜ (GELECEĞE NOT) -->
-        <div class="card">
-            <h2>💌 Zaman Kapsülü (Geleceğe Not)</h2>
-            <div class="capsule-form">
-                <input type="date" id="capsule-date">
-                <textarea id="capsule-text" placeholder="Seçilen tarihte açılacak özel notunuzu yazın..."></textarea>
-                <button onclick="saveCapsule()">Kapsülü Kilitle 🔒</button>
-            </div>
-            <div id="capsules-list"></div>
-        </div>
-
-        <!-- 8. ANI DEFTERİ & FOTOĞRAF ARŞİVİ -->
-        <div class="card">
-            <h2>📸 Anı Defterimiz</h2>
-            <div class="memory-form">
-                <input type="text" id="memory-title" placeholder="Anı Başlığı...">
-                <textarea id="memory-desc" placeholder="Neler hissettiniz? Anıyı anlatın..."></textarea>
-                <input type="file" id="memory-img" accept="image/*">
-                <button onclick="addMemory()">Anıyı Ekle 🌟</button>
-            </div>
-            <div class="memories-list" id="memories-container"></div>
-        </div>
-
-    </div>
-
-    <!-- Firebase SDK (Anlık senkronizasyon için) -->
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+        .capsule-form input, .capsule-form textarea { width: 100%; padding: 10px; border
